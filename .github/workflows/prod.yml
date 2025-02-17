@@ -24,3 +24,14 @@ jobs:
               run: docker build -t marcosalencarc/job_management .
             - name: Publish image
               run: docker push marcosalencarc/job_management
+            
+    deploy:
+        needs: build
+        runs-on: self-hosted
+        steps:
+            - name: Pull image docker hub
+              run: docker pull marcosalencarc/job_management:latest
+            - name: remove container
+              run: docker rm -f job_management
+            - name: Run docker container job_management
+              run: docker run -d -p 8080:8080 -e DATABASE_URL=${{secrets.DATABASE_URL}} -e DATABASE_PASSWORD=${{secrets.DATABASE_PASSWORD}} -e DATABASE_USERNAME=${{secrets.DATABASE_USERNAME}} --name job_management marcosalencarc/job_management:latest
